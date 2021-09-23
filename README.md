@@ -20,14 +20,15 @@ I mention in the comments where I would make improvements/additions if I was giv
 
 3rd party requirements to run
 
-*HTTParty
+HTTParty
+- gem install httparty
+- Then add "gem 'httparty'" to Gemfile
 
-gem install httparty
 
 Then to run:
 
-*rails s
-*Then hit the following CURL commands:
+- rails s
+- Then hit the following CURL commands:
 
 First endpoint that allows users to submit IP addresses. Fetches the country/city from GeoJS and stores them in server memory cache
 
