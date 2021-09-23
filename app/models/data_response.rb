@@ -1,0 +1,2 @@
+class DataResponse < ApplicationRecord
+end

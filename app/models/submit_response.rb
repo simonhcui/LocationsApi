@@ -1,0 +1,2 @@
+class SubmitResponse < ApplicationRecord
+end
