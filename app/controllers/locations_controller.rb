@@ -1,4 +1,3 @@
-require 'rest-client'
 require 'json'
 require 'httparty'
 
@@ -18,15 +17,20 @@ class LocationsController < ApplicationController
   $arr = Array.new
 
   def submit
+
+    responseDescription = "Country/city fetched from GeoJS and stored into server memory cache."
+
     # POST /locations/submit with required ip address query parameter
     # Query GeoJS Location by IP Address endpoint
     # Due to time constraints I am not addressing possible edge cases of improper user input.
     # In this case it would be for a nonexistent IP Address. 
-    # For covering that case I found that the GeoJS API will always return a 200 OK response no matter what the IP Address passed in is.
+    # For covering that case I found that the GeoJS endpoint will always return a 200 OK response no matter what the IP Address passed in is.
     # So the only way I see to detect such an edge case would be to do a check on the "longitude" or "latitude" fields 
     # As those are "nil" for nonexisting IP Addresses. Other fields do not give consistent enough responses. 
     # Of course that is just an assumption, the logical course of action would be to first contact the GeoJS team to ensure that we fully 
-    # understand how their API functions. 
+    # understand how their API functions.
+    # I have decided to take in the IP Address as a header instead of a query parameter like the GeoJS endpoint does.
+    # I believe it is more secure to store sensitive information such as one's IP Address as a header since query parameters are easily visible in browsers.  
     ip_address = request.headers["ip"]
     query = {
       "ip" => ip_address
@@ -40,15 +44,16 @@ class LocationsController < ApplicationController
     
     # Parse JSON response for city and country fields
     # Save city and country fields to Location model to be saved to cache
-    # Based off testing with the GeoJS API, it is possible for the city field to not be filled in the response
+    # Based off testing with the GeoJS endpoint, it is possible for the city field to not be filled in the response
     # For example, IP Address 156.74.181.208 should correspond to Seattle, USA but only the country is returned
     parsed = body.parsed_response
     if !parsed[0]["city"].nil?
       city = parsed[0]["city"]
     else
       city = ""
+      responseDescription = "Country fetched from GeoJS and stored into server memory cache, city could not be found."
     end
-    loc = Location.create(:city => parsed[0]["city"], :country => parsed[0]["country"])
+    loc = Location.create(:city => city, :country => parsed[0]["country"])
 
     # Setup and store IP_Address, Location pair to cache
     # IP_Address is then also saved to the global array. Then def data is called by the GET /locations/data endpoint.
@@ -58,12 +63,14 @@ class LocationsController < ApplicationController
     if Rails.cache.read(ip_address).nil?
       Rails.cache.write(ip_address, loc)
       $arr.push(ip_address)
+    else
+      responseDescription = "Duplicate IP Address, Location pair."
     end
     
     # Within the alloted time I did not have time to implement proper error handling.
     # The idea is that this response model will be able to return varying HTTP status codes and descriptions 
     # and that none of it would be hard coded here. 
-    response = SubmitResponse.create(:status_code => "200", :description => "Country/city fetched from GeoJS and stored into server memory cache")
+    response = SubmitResponse.create(:status_code => "200", :description => responseDescription)
     render json: response
   end
 
