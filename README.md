@@ -32,12 +32,15 @@ Then to run:
 
 First endpoint that allows users to submit IP addresses. Fetches the country/city from GeoJS and stores them in server memory cache
 
+```
 curl --location --request POST 'localhost:3000/locations/submit' \
 --header 'ip: [YOUR_IP_HERE]'
+```
 
+Second endpoint allows users to see all IP addresses tracked, and the data associated with it. The user is able to filter all IP addresses by country/city.
 
-2nd endpoint allows users to see all IP addresses tracked, and the data associated with it. The user is able to filter all IP addresses by country/city.
-
+```
 curl --location --request GET 'localhost:3000/locations/data' \
 --header 'city: [YOUR_CITY_HERE]' \
 --header 'country: [YOUR_COUNTRY_HERE]'
+```
