@@ -18,11 +18,16 @@ valid IP Address had the chance of not returning back all the expected fields in
 
 I mention in the comments where I would make improvements/additions if I was given the time. Thank you for your time and for the opportunity to test myself.
 
-To run:
+3rd party requirements to run
 
-rails s
+*HTTParty
 
-Then hit the following CURL commands:
+gem install httparty
+
+Then to run:
+
+*rails s
+*Then hit the following CURL commands:
 
 First endpoint that allows users to submit IP addresses. Fetches the country/city from GeoJS and stores them in server memory cache
 
